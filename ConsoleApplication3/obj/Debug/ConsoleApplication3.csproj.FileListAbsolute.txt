@@ -1,0 +1,16 @@
+c:\users\brenden\documents\visual studio 2013\Projects\ConsoleApplication3\ConsoleApplication3\bin\Debug\ConsoleApplication3.exe.config
+c:\users\brenden\documents\visual studio 2013\Projects\ConsoleApplication3\ConsoleApplication3\obj\Debug\ConsoleApplication3.csproj.App.config
+c:\users\brenden\documents\visual studio 2013\Projects\ConsoleApplication3\ConsoleApplication3\obj\Debug\ConsoleApplication3.csprojResolveAssemblyReference.cache
+c:\users\brenden\documents\visual studio 2013\Projects\ConsoleApplication3\ConsoleApplication3\bin\Debug\ConsoleApplication3.exe
+c:\users\brenden\documents\visual studio 2013\Projects\ConsoleApplication3\ConsoleApplication3\bin\Debug\ConsoleApplication3.pdb
+c:\users\brenden\documents\visual studio 2013\Projects\ConsoleApplication3\ConsoleApplication3\bin\Debug\Newtonsoft.Json.dll
+c:\users\brenden\documents\visual studio 2013\Projects\ConsoleApplication3\ConsoleApplication3\bin\Debug\PortableSteam.dll
+c:\users\brenden\documents\visual studio 2013\Projects\ConsoleApplication3\ConsoleApplication3\bin\Debug\System.Net.Http.Extensions.dll
+c:\users\brenden\documents\visual studio 2013\Projects\ConsoleApplication3\ConsoleApplication3\bin\Debug\System.Net.Http.Primitives.dll
+c:\users\brenden\documents\visual studio 2013\Projects\ConsoleApplication3\ConsoleApplication3\bin\Debug\TinySteamWrapper.dll
+c:\users\brenden\documents\visual studio 2013\Projects\ConsoleApplication3\ConsoleApplication3\bin\Debug\Newtonsoft.Json.xml
+c:\users\brenden\documents\visual studio 2013\Projects\ConsoleApplication3\ConsoleApplication3\bin\Debug\PortableSteam.xml
+c:\users\brenden\documents\visual studio 2013\Projects\ConsoleApplication3\ConsoleApplication3\bin\Debug\System.Net.Http.Extensions.xml
+c:\users\brenden\documents\visual studio 2013\Projects\ConsoleApplication3\ConsoleApplication3\bin\Debug\System.Net.Http.Primitives.xml
+c:\users\brenden\documents\visual studio 2013\Projects\ConsoleApplication3\ConsoleApplication3\obj\Debug\ConsoleApplication3.exe
+c:\users\brenden\documents\visual studio 2013\Projects\ConsoleApplication3\ConsoleApplication3\obj\Debug\ConsoleApplication3.pdb
