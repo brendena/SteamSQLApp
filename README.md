@@ -11,6 +11,8 @@ Good reads for c#
 http://andymcm.com/csharpfaq.htm
 http://www.codeproject.com/Articles/4416/Beginners-guide-to-accessing-SQL-Server-through-C
 http://www.dotnetperls.com/debugging
+http://csharp.net-informations.com/collection/csharp-array.htm
+https://msdn.microsoft.com/en-us/magazine/cc301520.aspx
 
 
 Things to remember
