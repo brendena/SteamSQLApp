@@ -17,98 +17,85 @@ namespace PortableSteam
     {
         static void Main(string[] args)
         {
-
-
-            SqlConnection conn = new SqlConnection("Server=BRENDEN_PC\\SQLEXPRESS;Database=steamDb;Integrated Security=true");
+//OPEN CONNECTION AND DEFINE TARGET PLAYER
+            //open the sql connection by finding the server on the currently used computer
+            SqlConnection conn = new SqlConnection( "user id=CHAMPLAIN\\colin.reilly" +
+                                                    "password = coljack" +
+                                                    "MININT-G4VR32G//SQLEXPRESS;" +
+                                                    "Database=steamDb;" +
+                                                    "Integrated Security=true");
             conn.Open();
 
-            long[] steamID = new long[] { 76561198065588383, 76561198047886273 };
-            SteamWebAPI.SetGlobalKey("6373F8810E9FA6C9781491E5F32D753F");
-            /*
-            var mySteamLevel = SteamWebAPI.General()
-                                    .IPlayerService()
-                                    .GetSteamLevel(SteamIdentity.FromSteamID(76561198047886273))
-                                    .GetResponse();
+            //define target player cridentials 
+            //long[] steamID = new long[] { 76561198065588383, 76561198047886273 };
+            SteamWebAPI.SetGlobalKey("00E30769A6BA27CB7804374A82DBD737");
 
-            //var response = SteamWebAPI.General().ISteamApps().GetAppList().GetResponseString();
+            //create steam identity
+            var colin = SteamIdentity.FromSteamID(76561198047886273);
+            var brenden = SteamIdentity.FromSteamID(76561198065588383);
+/*
+//POPULATE GAME TABLE
+            //define sql command
+            string gameStatement = "INSERT INTO game(gameId, name) VALUES(@GameID, @Name)";
 
-            //Console.WriteLine(response);
-            /*
-            var hello = SteamWebAPI.General().ISteamUser().GetFriendList(SteamIdentity.FromSteamID(76561198047886273), RelationshipType.All).GetResponse();
-            foreach (var friend in hello.Data.Friends)
-            {
-                Console.WriteLine(friend.Identity.SteamID);
-            }
-            var steamProfiles = SteamWebAPI.General().ISteamUser().GetPlayerSummaries(SteamIdentity.FromSteamID(76561198065588383)).GetResponse();
-            foreach (var player in steamProfiles.Data.Players){
-                Console.WriteLine(player.PersonaName);
-                Console.WriteLine(player.ProfileUrl);
-                Console.WriteLine(player.Identity);  //not your steam id
-                Console.WriteLine(player.LastLogOff);
-            }
-            */
-            string stmt = "INSERT INTO game(gameId, name) VALUES(@GameID, @Name)";
+            SqlCommand gameCommand = new SqlCommand(gameStatement, conn);
+            gameCommand.Parameters.Add("@GameID", SqlDbType.Int);
+            gameCommand.Parameters.Add("@Name", SqlDbType.VarChar, 50);
 
-            SqlCommand cmd = new SqlCommand(stmt, conn);
-            cmd.Parameters.Add("@GameIDd", SqlDbType.Int);
-            cmd.Parameters.Add("@Name", SqlDbType.VarChar, 50);
-
-                
-
+            //get the game info on the currently defined player
             var gameInfo = SteamWebAPI.General().ISteamApps().GetAppList().GetResponse();
 
+            //cycle through the returned data and execute each command
             foreach (var game in gameInfo.Data.Apps){
                 Console.WriteLine(game.Name);
                 Console.WriteLine(game.AppID);
-                cmd.Parameters["@GameID"].Value = game.AppID;
-                cmd.Parameters["@Name"].Value = game.Name;
+                gameCommand.Parameters["@GameID"].Value = game.AppID;
+                gameCommand.Parameters["@Name"].Value = game.Name;
 
-                cmd.ExecuteNonQuery();
-                if (game.AppID > 300){
-                    
+                gameCommand.ExecuteNonQuery();
+                if (game.AppID > 300)
                     break;
-                }
-            }
-            
-           
-            conn.Close();
-            /*
-            var ownedGames = SteamWebAPI.General().IPlayerService().GetOwnedGames(SteamIdentity.FromSteamID(76561198047886273)).GetResponse();
-            foreach (var game in ownedGames.Data.Games) {
-                Console.WriteLine(game.PlayTime2Weeks);
-                Console.WriteLine(game.PlayTimeTotal);
-            }
-            var gameSchema = SteamWebAPI.General().ISteamUserStats().GetSchemaForGame(220).GetResponse();  //half-life 2
-            if (gameSchema.Response.ErrorCode != 500)
-            { //if th server has issue 
-                if (gameSchema.Data.AvailableGameStats != null)
-                {
-                    foreach (var achievement in gameSchema.Data.AvailableGameStats.Achievements)
-                    {
-                        Console.WriteLine(achievement.Name);
-                    }
-                }
-            }
-            var playersAchievementsGame = SteamWebAPI.General().ISteamUserStats().GetPlayerAchievements(220, SteamIdentity.FromSteamID(76561198047886273)).GetResponse();
-            if (playersAchievementsGame.Response.ErrorCode != 500)
-            {
-                foreach (var achivement in playersAchievementsGame.Data.Achievements)
-                {
-                    Console.WriteLine(achivement.APIName);
-                    Console.WriteLine(achivement.Achieved);
-                    Console.WriteLine(achivement.Name);
-                }
-            }
-            Console.WriteLine("hello");
-            var identity = SteamIdentity.FromSteamID(steamID[1]);
-            Console.WriteLine(identity.AccountID);
-            */
-            Console.WriteLine("asdf");
-            Console.ReadLine();
+            }*/
+//POPULATE PLAYER TABLE
+            //define sql command
+            string playerStatement = "INSERT INTO player(steamId, personName, profileURL, lastLogOff) VALUES(@SteamId, @PersonName, @ProfileURL, @LastLogOff)";
 
+            SqlCommand playerCommand = new SqlCommand(playerStatement, conn);
+            playerCommand.Parameters.Add("@SteamId", SqlDbType.Int);
+            playerCommand.Parameters.Add("@PersonName", SqlDbType.VarChar, 30);
+            playerCommand.Parameters.Add("@ProfileURL", SqlDbType.VarChar, 75);
+            playerCommand.Parameters.Add("@LastLogOff", SqlDbType.Int);
+
+            //get the game info on the currently defined player
+            var playerInfo = SteamWebAPI.General().ISteamUser().GetPlayerSummaries(colin).GetResponse();
+
+            Console.WriteLine(sizeof(int)); // Output: 4
+
+            /*//cycle through the returned data and execute each command
+            foreach (var player in playerInfo.Data.Players)
+            {
+                Console.WriteLine(colin.SteamID);
+                Console.WriteLine(player.PersonaName);
+                Console.WriteLine(player.ProfileUrl);
+                Console.WriteLine(player.LastLogOff);
+                playerCommand.Parameters["@SteamId"].Value = colin.SteamID;
+                playerCommand.Parameters["@PersonName"].Value = player.PersonaName;
+                playerCommand.Parameters["@ProfileURL"].Value = player.ProfileUrl;
+                playerCommand.Parameters["@LastLogOff"].Value = player.LastLogOff;
+                
+                //playerCommand.ExecuteNonQuery();
+            }*/
+
+            //close sql connection and exit
+            conn.Close();
+            Console.WriteLine("press enter to exit");
+            Console.ReadLine();
         }
     }
 }
+
+
+
 
 /*
 https://wiki.teamfortress.com/wiki/WebAPI/GetPlayerSummaries
@@ -131,7 +118,7 @@ GetOwnedGames
         -playtime_2weeks - possible null value
         -playtime_forever -possible null value
     
-//achivments
+//achievments
 https://wiki.teamfortress.com/wiki/WebAPI/GetSchemaForGame
 ISteamUserStats
 GetSchemaForGame
@@ -161,3 +148,63 @@ reader.Close();
 conn.Close();
 */
 
+
+
+
+/*
+           var mySteamLevel = SteamWebAPI.General()
+                                   .IPlayerService()
+                                   .GetSteamLevel(SteamIdentity.FromSteamID(76561198047886273))
+                                   .GetResponse();
+
+           //var response = SteamWebAPI.General().ISteamApps().GetAppList().GetResponseString();
+
+           //Console.WriteLine(response);
+           /*
+           var hello = SteamWebAPI.General().ISteamUser().GetFriendList(SteamIdentity.FromSteamID(76561198047886273), RelationshipType.All).GetResponse();
+           foreach (var friend in hello.Data.Friends)
+           {
+               Console.WriteLine(friend.Identity.SteamID);
+           }
+           var steamProfiles = SteamWebAPI.General().ISteamUser().GetPlayerSummaries(SteamIdentity.FromSteamID(76561198065588383)).GetResponse();
+           foreach (var player in steamProfiles.Data.Players){
+               Console.WriteLine(player.PersonaName);
+               Console.WriteLine(player.ProfileUrl);
+               Console.WriteLine(player.Identity);  //not your steam id
+               Console.WriteLine(player.LastLogOff);
+           }
+           */
+
+
+
+/*
+          var ownedGames = SteamWebAPI.General().IPlayerService().GetOwnedGames(SteamIdentity.FromSteamID(76561198047886273)).GetResponse();
+          foreach (var game in ownedGames.Data.Games) {
+              Console.WriteLine(game.PlayTime2Weeks);
+              Console.WriteLine(game.PlayTimeTotal);
+          }
+          var gameSchema = SteamWebAPI.General().ISteamUserStats().GetSchemaForGame(220).GetResponse();  //half-life 2
+          if (gameSchema.Response.ErrorCode != 500)
+          { //if th server has issue 
+              if (gameSchema.Data.AvailableGameStats != null)
+              {
+                  foreach (var achievement in gameSchema.Data.AvailableGameStats.Achievements)
+                  {
+                      Console.WriteLine(achievement.Name);
+                  }
+              }
+          }
+          var playersAchievementsGame = SteamWebAPI.General().ISteamUserStats().GetPlayerAchievements(220, SteamIdentity.FromSteamID(76561198047886273)).GetResponse();
+          if (playersAchievementsGame.Response.ErrorCode != 500)
+          {
+              foreach (var achivement in playersAchievementsGame.Data.Achievements)
+              {
+                  Console.WriteLine(achivement.APIName);
+                  Console.WriteLine(achivement.Achieved);
+                  Console.WriteLine(achivement.Name);
+              }
+          }
+          Console.WriteLine("hello");
+          var identity = SteamIdentity.FromSteamID(steamID[1]);
+          Console.WriteLine(identity.AccountID);
+          */
