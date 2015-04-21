@@ -19,9 +19,7 @@ namespace PortableSteam
         {
 //OPEN CONNECTION AND DEFINE TARGET PLAYER
             //open the sql connection by finding the server on the currently used computer
-            SqlConnection conn = new SqlConnection( "user id=CHAMPLAIN\\colin.reilly" +
-                                                    "password = coljack" +
-                                                    "MININT-G4VR32G//SQLEXPRESS;" +
+            SqlConnection conn = new SqlConnection( "Server=COLINREILLY\\SQLEXPRESS;" +
                                                     "Database=steamDb;" +
                                                     "Integrated Security=true");
             conn.Open();
@@ -33,10 +31,10 @@ namespace PortableSteam
             //create steam identity
             var colin = SteamIdentity.FromSteamID(76561198047886273);
             var brenden = SteamIdentity.FromSteamID(76561198065588383);
-/*
+
 //POPULATE GAME TABLE
             //define sql command
-            string gameStatement = "INSERT INTO game(gameId, name) VALUES(@GameID, @Name)";
+            string gameStatement = "INSERT INTO Game(gameId, name) VALUES(@GameID, @Name)";
 
             SqlCommand gameCommand = new SqlCommand(gameStatement, conn);
             gameCommand.Parameters.Add("@GameID", SqlDbType.Int);
@@ -55,23 +53,22 @@ namespace PortableSteam
                 gameCommand.ExecuteNonQuery();
                 if (game.AppID > 300)
                     break;
-            }*/
+            }
+
 //POPULATE PLAYER TABLE
             //define sql command
-            string playerStatement = "INSERT INTO player(steamId, personName, profileURL, lastLogOff) VALUES(@SteamId, @PersonName, @ProfileURL, @LastLogOff)";
+            string playerStatement = "INSERT INTO Player(steamId, personName, profileURL, lastLogOff) VALUES(@SteamId, @PersonName, @ProfileURL, @LastLogOff)";
 
             SqlCommand playerCommand = new SqlCommand(playerStatement, conn);
-            playerCommand.Parameters.Add("@SteamId", SqlDbType.Int);
+            playerCommand.Parameters.Add("@SteamId", SqlDbType.BigInt);
             playerCommand.Parameters.Add("@PersonName", SqlDbType.VarChar, 30);
             playerCommand.Parameters.Add("@ProfileURL", SqlDbType.VarChar, 75);
-            playerCommand.Parameters.Add("@LastLogOff", SqlDbType.Int);
+            playerCommand.Parameters.Add("@LastLogOff", SqlDbType.DateTime);
 
             //get the game info on the currently defined player
             var playerInfo = SteamWebAPI.General().ISteamUser().GetPlayerSummaries(colin).GetResponse();
 
-            Console.WriteLine(sizeof(int)); // Output: 4
-
-            /*//cycle through the returned data and execute each command
+            //cycle through the returned data and execute each command
             foreach (var player in playerInfo.Data.Players)
             {
                 Console.WriteLine(colin.SteamID);
@@ -83,8 +80,30 @@ namespace PortableSteam
                 playerCommand.Parameters["@ProfileURL"].Value = player.ProfileUrl;
                 playerCommand.Parameters["@LastLogOff"].Value = player.LastLogOff;
                 
-                //playerCommand.ExecuteNonQuery();
-            }*/
+                playerCommand.ExecuteNonQuery();
+            }
+
+//POPULATE ACHIEVEMENT TABLE
+            //define sql command
+            string achievementStatement = "INSERT INTO Achievement(Name, gameId) VALUES(@Name, @GameId)";
+
+            SqlCommand achievementCommand = new SqlCommand(achievementStatement, conn);
+            achievementCommand.Parameters.Add("@Name", SqlDbType.VarChar, 50);
+            achievementCommand.Parameters.Add("@GameId", SqlDbType.Int);
+
+            //get the game info on the currently defined player
+            var achievementInfo = SteamWebAPI.General().ISteamUserStats().GetPlayerAchievements(440, colin).GetResponse();
+
+            //cycle through the returned data and execute each command
+            foreach (var achievement in achievementInfo.Data.Achievements)
+            {
+                Console.WriteLine(achievement.APIName);
+                Console.WriteLine(440);
+                achievementCommand.Parameters["@Name"].Value = achievement.APIName;
+                achievementCommand.Parameters["@GameId"].Value = 440;
+
+                achievementCommand.ExecuteNonQuery();
+            }
 
             //close sql connection and exit
             conn.Close();
@@ -93,7 +112,6 @@ namespace PortableSteam
         }
     }
 }
-
 
 
 
