@@ -27,3 +27,32 @@ Things to remember
 In the current code your namespace is PortableSteam.
 So SteamWebAPI and SteamIdentity or ReleastionshipType are all inherited from PortableSteam.
 There's a differance from acount.id and steam.id
+
+SQL Schema
+----------
+
+Player(
+	steamId int,
+	personName varchar(30),
+	profileURL varchar(75),
+	lastLogOff int)
+
+Game(
+	gameId int,
+	name varchar(50))
+
+Achievement(
+	name varchar(50),
+	gameId int)
+
+GameOwned(
+	steamId int,
+	gameId int, 
+	playTimeTwoWeek int,
+	playTimeForever int)
+
+AchievementOwned(
+	gameId int,
+	playerId int,
+	achievementId int,
+	completed binary(1))
