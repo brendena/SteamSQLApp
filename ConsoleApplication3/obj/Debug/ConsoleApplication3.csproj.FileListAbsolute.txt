@@ -14,3 +14,19 @@ c:\users\brenden\documents\visual studio 2013\Projects\ConsoleApplication3\Conso
 c:\users\brenden\documents\visual studio 2013\Projects\ConsoleApplication3\ConsoleApplication3\bin\Debug\System.Net.Http.Primitives.xml
 c:\users\brenden\documents\visual studio 2013\Projects\ConsoleApplication3\ConsoleApplication3\obj\Debug\ConsoleApplication3.exe
 c:\users\brenden\documents\visual studio 2013\Projects\ConsoleApplication3\ConsoleApplication3\obj\Debug\ConsoleApplication3.pdb
+C:\Users\colin reilly\Dropbox\school\spring 2015\database management systems\Final\shittysteamsqlapp\ConsoleApplication3\bin\Debug\ConsoleApplication3.exe.config
+C:\Users\colin reilly\Dropbox\school\spring 2015\database management systems\Final\shittysteamsqlapp\ConsoleApplication3\obj\Debug\ConsoleApplication3.exe
+C:\Users\colin reilly\Dropbox\school\spring 2015\database management systems\Final\shittysteamsqlapp\ConsoleApplication3\obj\Debug\ConsoleApplication3.pdb
+C:\Users\colin reilly\Dropbox\school\spring 2015\database management systems\Final\shittysteamsqlapp\ConsoleApplication3\bin\Debug\ConsoleApplication3.exe
+C:\Users\colin reilly\Dropbox\school\spring 2015\database management systems\Final\shittysteamsqlapp\ConsoleApplication3\bin\Debug\ConsoleApplication3.pdb
+C:\Users\colin reilly\Dropbox\school\spring 2015\database management systems\Final\shittysteamsqlapp\ConsoleApplication3\bin\Debug\Newtonsoft.Json.dll
+C:\Users\colin reilly\Dropbox\school\spring 2015\database management systems\Final\shittysteamsqlapp\ConsoleApplication3\bin\Debug\PortableSteam.dll
+C:\Users\colin reilly\Dropbox\school\spring 2015\database management systems\Final\shittysteamsqlapp\ConsoleApplication3\bin\Debug\System.Net.Http.Extensions.dll
+C:\Users\colin reilly\Dropbox\school\spring 2015\database management systems\Final\shittysteamsqlapp\ConsoleApplication3\bin\Debug\System.Net.Http.Primitives.dll
+C:\Users\colin reilly\Dropbox\school\spring 2015\database management systems\Final\shittysteamsqlapp\ConsoleApplication3\bin\Debug\TinySteamWrapper.dll
+C:\Users\colin reilly\Dropbox\school\spring 2015\database management systems\Final\shittysteamsqlapp\ConsoleApplication3\bin\Debug\Newtonsoft.Json.xml
+C:\Users\colin reilly\Dropbox\school\spring 2015\database management systems\Final\shittysteamsqlapp\ConsoleApplication3\bin\Debug\PortableSteam.xml
+C:\Users\colin reilly\Dropbox\school\spring 2015\database management systems\Final\shittysteamsqlapp\ConsoleApplication3\bin\Debug\System.Net.Http.Extensions.xml
+C:\Users\colin reilly\Dropbox\school\spring 2015\database management systems\Final\shittysteamsqlapp\ConsoleApplication3\bin\Debug\System.Net.Http.Primitives.xml
+C:\Users\colin reilly\Dropbox\school\spring 2015\database management systems\Final\shittysteamsqlapp\ConsoleApplication3\obj\Debug\ConsoleApplication3.csproj.App.config
+C:\Users\colin reilly\Dropbox\school\spring 2015\database management systems\Final\shittysteamsqlapp\ConsoleApplication3\obj\Debug\ConsoleApplication3.csprojResolveAssemblyReference.cache
