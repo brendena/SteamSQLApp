@@ -264,14 +264,18 @@ namespace PortableSteam
 
          }
 
-         static void dropAllTables(SqlConnection conn)
+          static void resetAllTables(SqlConnection conn)
          {    
-             executeSQLStatment(conn,"Truncate table Player;\n" + 
-                                     "Truncate table Game;\n" + 
-                                     "truncate table Achievement;\n" + 
-                                     "truncate table GameOwned;\n" + 
-                                     "truncate table AchievementOwned;\n");
-
+             executeSQLStatment(conn,"drop table Player;\n" + 
+                                     "drop table Game;\n" + 
+                                     "drop table Achievement;\n" + 
+                                     "drop table GameOwned;\n" + 
+                                     "drop table AchievementOwned;\n");
+             executeSQLStatment(conn,"create table Player( steamId int, personName varchar(30), profileURL varchar(75), lastLogOff int);\n" + 
+                                     "create table Game( gameId int, name varchar(50));\n" + 
+                                     "create table Achievement( name varchar(50), gameId int);\n" + 
+                                     "create table GameOwned( steamId int, gameId int, playTimeTwoWeek int, playTimeForever int);\n" + 
+                                     "create table AchievementOwned( gameId int, playerId int, achievementId int, completed binary(1));\n");
          }
 
          static void executeSQLStatment(SqlConnection conn, string statment)
