@@ -18,17 +18,17 @@ namespace PortableSteam
         static void Main(string[] args)
         {
 //OPEN CONNECTION AND DEFINE TARGET PLAYER
-            //open the sql connection by finding the server on the currently used computer
-            SqlConnection conn = new SqlConnection("Server=COLINREILLY\\SQLEXPRESS;" +
-                                                    "Database=steamDb;" +
-                                                    "Integrated Security=true");
-            conn.Open();
+           //open the sql connection by finding the server on the currently used computer
+           SqlConnection conn = new SqlConnection("Server=COLINREILLY\\SQLEXPRESS;" +
+                                                   "Database=steamDb;" +
+                                                   "Integrated Security=true");
+           conn.Open();
 //feature request: check if connection was opened properly
+           
+           SqlDataReader reader;
+           reader = null;
 
-            SqlDataReader reader = executeSQLStatmentWithReturn(conn, "SELECT * FROM Player"); //just to trick the compile into thinking there values inside reader
-            reader.Close(); //you have to Close a reader before you can use another one
-
-            string value = getInputFor("go through the options\n" +
+           string value = getInputFor("go through the options\n" +
                                         "1 profile\n" +
                                         "2 game\n" +
                                         "3 achivment\n" +
@@ -68,7 +68,7 @@ namespace PortableSteam
                                 Console.WriteLine("{0}", reader.GetInt64(0));
                                 Console.WriteLine("{0}", reader.GetString(1));
                                 Console.WriteLine("{0}", reader.GetString(2));
-                                Console.WriteLine("{0}", reader.GetInt32(3));
+                                Console.WriteLine("{0}", reader.GetDateTime(3));
                             } while (reader.Read());
                         else
                         { //if you can't read anything from reader that means you didn't get any rows of data
@@ -132,7 +132,6 @@ namespace PortableSteam
                     }
                     if (reader != null)
                     {
-
                         if (reader.Read())
                             do
                             {
@@ -147,7 +146,8 @@ namespace PortableSteam
                     }
                     break;
                 case 4: //rebuild everthing
-                    dropAllTables(conn);
+                    //dropAllTables(conn);
+                    //createAllTables(conn);
                     getAllData(conn);
                     break;
                 default:
@@ -156,8 +156,8 @@ namespace PortableSteam
                     break;
             }
             Console.ReadLine();
+         }
 
-        }
          static void getAllData(SqlConnection conn) { 
 //define target player cridentials 
             //long[] steamID = new long[] { 76561198065588383, 76561198047886273 };
@@ -175,7 +175,7 @@ namespace PortableSteam
             playerCommand.Parameters.Add("@SteamId", SqlDbType.BigInt);
             playerCommand.Parameters.Add("@PersonName", SqlDbType.VarChar, 30);
             playerCommand.Parameters.Add("@ProfileURL", SqlDbType.VarChar, 75);
-            playerCommand.Parameters.Add("@LastLogOff", SqlDbType.Int);
+            playerCommand.Parameters.Add("@LastLogOff", SqlDbType.DateTime);
 
             //get the game info on the currently defined player
             var playerInfo = SteamWebAPI.General().ISteamUser().GetPlayerSummaries(colin).GetResponse();
@@ -190,39 +190,34 @@ namespace PortableSteam
                 playerCommand.Parameters["@SteamId"].Value = colin.SteamID;
                 playerCommand.Parameters["@PersonName"].Value = player.PersonaName;
                 playerCommand.Parameters["@ProfileURL"].Value = player.ProfileUrl;
-                playerCommand.Parameters["@LastLogOff"].Value = (Int32)(player.LastLogOff.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+                playerCommand.Parameters["@LastLogOff"].Value = player.LastLogOff;
 
                 playerCommand.ExecuteNonQuery();
             }
 
 //POPULATE ACHIEVEMENT TABLE
             //define sql command
-            string achievementStatement = "INSERT INTO Achievement(Name, gameId, achivementNumber) VALUES(@Name, @GameId,@AchivementNumber)";
+            string achievementStatement = "INSERT INTO Achievement(Name, gameId) VALUES(@Name, @GameId)";
 
             SqlCommand achievementCommand = new SqlCommand(achievementStatement, conn);
             achievementCommand.Parameters.Add("@Name", SqlDbType.VarChar, 50);
             achievementCommand.Parameters.Add("@GameId", SqlDbType.Int);
-            achievementCommand.Parameters.Add("@AchivementNumber", SqlDbType.Int);
 
             //get the game info on the currently defined player
             var achievementInfo = SteamWebAPI.General().ISteamUserStats().GetPlayerAchievements(440, colin).GetResponse();
 
             //cycle through the returned data and execute each command
-            int i = 1; // achivementNumber is based of the index of array
             foreach (var achievement in achievementInfo.Data.Achievements)
             {
                 Console.WriteLine(achievement.APIName);
                 Console.WriteLine(440);
-                Console.WriteLine(i);
                 achievementCommand.Parameters["@Name"].Value = achievement.APIName;
                 achievementCommand.Parameters["@GameId"].Value = 440;
-                achievementCommand.Parameters["@AchivementNumber"].Value = i;
 
                 achievementCommand.ExecuteNonQuery();
-                i++;
             }
 
-            //POPULATE GAME TABLE
+//POPULATE GAME TABLE
             //define sql command
             string gameStatement = "INSERT INTO Game(gameId, name) VALUES(@GameID, @Name)";
 
@@ -252,30 +247,22 @@ namespace PortableSteam
             Console.ReadLine();
         }//end of getAllData
 
-         static void listOutAvaible(string type, SqlConnection conn)
-         {
-             /*
-              this should output sql quaries
-              games owned title
-              player 
-              */
-             if (type != "players" && type != "games")
-                 Console.WriteLine(type + "is not a valid argument");
-
-         }
-
-          static void resetAllTables(SqlConnection conn)
+         static void dropAllTables(SqlConnection conn)
          {    
              executeSQLStatment(conn,"drop table Player;\n" + 
                                      "drop table Game;\n" + 
                                      "drop table Achievement;\n" + 
                                      "drop table GameOwned;\n" + 
                                      "drop table AchievementOwned;\n");
-             executeSQLStatment(conn,"create table Player( steamId int, personName varchar(30), profileURL varchar(75), lastLogOff int);\n" + 
-                                     "create table Game( gameId int, name varchar(50));\n" + 
-                                     "create table Achievement( name varchar(50), gameId int);\n" + 
-                                     "create table GameOwned( steamId int, gameId int, playTimeTwoWeek int, playTimeForever int);\n" + 
-                                     "create table AchievementOwned( gameId int, playerId int, achievementId int, completed binary(1));\n");
+         }
+
+         static void createAllTables(SqlConnection conn)
+         {
+             executeSQLStatment(conn, "create table Player( steamId int, personName varchar(30), profileURL varchar(75), lastLogOff int);" +
+                                      "create table Game( gameId int, name varchar(50));" +
+                                      "create table Achievement( name varchar(50), gameId int);" +
+                                      "create table GameOwned( steamId int, gameId int, playTimeTwoWeek int, playTimeForever int);" +
+                                      "create table AchievementOwned( gameId int, playerId int, achievementId int, completed binary(1));" );
          }
 
          static void executeSQLStatment(SqlConnection conn, string statment)
@@ -316,8 +303,6 @@ namespace PortableSteam
     }
 }
 
-
-
 /*
 https://wiki.teamfortress.com/wiki/WebAPI/GetPlayerSummaries
 ISteamUser-
@@ -350,46 +335,10 @@ GetPlayerAchievements
     -
 */
 
-
-
-
 /*
 SqlConnection conn = new SqlConnection("Server=BRENDEN_PC\\SQLEXPRESS;Database=shipsDB;Integrated Security=true");
 */
 
-
-
-/*
-          var ownedGames = SteamWebAPI.General().IPlayerService().GetOwnedGames(SteamIdentity.FromSteamID(76561198047886273)).GetResponse();
-          foreach (var game in ownedGames.Data.Games) {
-              Console.WriteLine(game.PlayTime2Weeks);
-              Console.WriteLine(game.PlayTimeTotal);
-          }
-          var gameSchema = SteamWebAPI.General().ISteamUserStats().GetSchemaForGame(220).GetResponse();  //half-life 2
-          if (gameSchema.Response.ErrorCode != 500)
-          { //if th server has issue 
-              if (gameSchema.Data.AvailableGameStats != null)
-              {
-                  foreach (var achievement in gameSchema.Data.AvailableGameStats.Achievements)
-                  {
-                      Console.WriteLine(achievement.Name);
-                  }
-              }
-          }
-          var playersAchievementsGame = SteamWebAPI.General().ISteamUserStats().GetPlayerAchievements(220, SteamIdentity.FromSteamID(76561198047886273)).GetResponse();
-          if (playersAchievementsGame.Response.ErrorCode != 500)
-          {
-              foreach (var achivement in playersAchievementsGame.Data.Achievements)
-              {
-                  Console.WriteLine(achivement.APIName);
-                  Console.WriteLine(achivement.Achieved);
-                  Console.WriteLine(achivement.Name);
-              }
-          }
-          Console.WriteLine("hello");
-          var identity = SteamIdentity.FromSteamID(steamID[1]);
-          Console.WriteLine(identity.AccountID);
-          */
 /*
  * how reader works
  http://idealprogrammer.com/net-languages/code-samples/sqldatareader-source-code/
