@@ -240,7 +240,36 @@ namespace PortableSteam
                 if (game.AppID > 300)
                     break;
             }
+            
+            
+            //POPULATE GameOwned TABLE
+            //define sql command
+            string gameOwnedStatement = "INSERT INTO GameOwned(steamId, gameId,playTimeTwoWeek,playTimeForever) VALUES(@SteamId, @GameID, @PlayTimeTwoWeek, @PlayTimeForever)";
 
+            SqlCommand gameOwnedCommand = new SqlCommand(gameOwnedStatement, conn);
+            gameOwnedCommand.Parameters.Add("@SteamId", SqlDbType.BigInt);
+            gameOwnedCommand.Parameters.Add("@GameID", SqlDbType.Int);
+            gameOwnedCommand.Parameters.Add("@PlayTimeTwoWeek", SqlDbType.Int);
+            gameOwnedCommand.Parameters.Add("@PlayTimeForever", SqlDbType.VarChar, 50);
+            //get the game info on the currently defined player
+            var gameOwnedInfo = SteamWebAPI.General().IPlayerService().GetOwnedGames(colin).GetResponse();
+
+            //cycle through the returned data and execute each command
+            foreach (var gameOwned in gameOwnedInfo.Data.Games)
+            {
+                Console.WriteLine(gameOwned.Name);
+                Console.WriteLine(gameOwned.AppID);
+                gameOwnedCommand.Parameters["@SteamId"].Value = colin;
+                gameOwnedCommand.Parameters["@GameID"].Value = gameOwned.AppID;
+                gameOwnedCommand.Parameters["@PlayTimeTwoWeek"].Value = gameOwned.PlayTime2Weeks;
+                gameOwnedCommand.Parameters["@PlayTimeForever"].Value = gameOwned.PlayTimeTotal;
+
+                gameOwnedCommand.ExecuteNonQuery();
+                if (gameOwned.AppID > 300)
+                    break;
+            }
+            
+            
             //close sql connection and exit
             conn.Close();
             Console.WriteLine("press enter to exit");
