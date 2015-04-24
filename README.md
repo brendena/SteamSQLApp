@@ -1,4 +1,5 @@
-# shittySteamSQLApp
+shittySteamSQLApp
+-----------------
 
 Portable Steam doc's
 https://portablesteamwebapi.codeplex.com/documentation
@@ -56,3 +57,9 @@ AchievementOwned(
 	playerId int,
 	achievementId int,
 	completed binary(1))
+
+
+CODING STANDARDS
+----------------
+1) If comments are capatalized they should also have no indent
+2) feature request: means feature request
