@@ -164,7 +164,7 @@ namespace PortableSteam
             SteamWebAPI.SetGlobalKey("00E30769A6BA27CB7804374A82DBD737");
 
             //create steam identity
-            var colin = SteamIdentity.FromSteamID(76561198047886273);
+            var colin = SteamIdentity.FromSteamID(76561198018133285);
             var brenden = SteamIdentity.FromSteamID(76561198065588383);
 
 //POPULATE PLAYER TABLE
