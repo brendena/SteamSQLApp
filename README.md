@@ -36,27 +36,32 @@ Player(
 	steamId int,
 	personName varchar(30),
 	profileURL varchar(75),
-	lastLogOff int)
+	lastLogOff int,
+	Primary Key(steamId))
 
 Game(
 	gameId int,
-	name varchar(50))
+	name varchar(50),
+	Primary Key(gameId))
 
 Achievement(
 	name varchar(50),
-	gameId int)
+	gameId int,
+	Primary Key(name,gameId))
 
 GameOwned(
 	steamId int,
 	gameId int, 
 	playTimeTwoWeek int,
-	playTimeForever int)
+	playTimeForever int,
+	Primary Key(steamId,gameId))
 
 AchievementOwned(
 	gameId int,
 	playerId int,
 	achievementId int,
-	completed binary(1))
+	completed binary(1),
+	Primary Key(gameId,playerId,achievementId))
 
 
 CODING STANDARDS
