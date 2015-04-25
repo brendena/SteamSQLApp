@@ -33,10 +33,10 @@ SQL Schema
 ----------
 
 Player(
-	steamId int,
+	steamId BigInt,
 	personName varchar(30),
 	profileURL varchar(75),
-	lastLogOff int,
+	lastLogOff DateTime,
 	Primary Key(steamId))
 
 Game(
@@ -50,7 +50,7 @@ Achievement(
 	Primary Key(name,gameId))
 
 GameOwned(
-	steamId int,
+	steamId BigInt,
 	gameId int, 
 	playTimeTwoWeek int,
 	playTimeForever int,
@@ -58,7 +58,7 @@ GameOwned(
 
 AchievementOwned(
 	gameId int,
-	playerId int,
+	playerId BigInt,
 	achievementId int,
 	completed binary(1),
 	Primary Key(gameId,playerId,achievementId))
