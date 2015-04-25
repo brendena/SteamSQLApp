@@ -65,7 +65,7 @@ AchievementOwned(
 
 
 SQL starter Code
-
+----------------
 drop table Player;
 drop table Game;
 drop table Achievement;
