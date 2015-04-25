@@ -57,11 +57,31 @@ GameOwned(
 	Primary Key(steamId,gameId))
 
 AchievementOwned(
-	gameId int,
 	playerId BigInt,
+	gameId int,
 	achievementId int,
-	completed binary(1),
 	Primary Key(gameId,playerId,achievementId))
+
+
+
+SQL starter Code
+
+drop table Player;
+drop table Game;
+drop table Achievement;
+drop table GameOwned;
+drop table AchievementOwned;
+
+create table Player( steamId Bigint , personName varchar(30), profileURL varchar(75), lastLogOff DateTime)
+
+create table Game( gameId int , name varchar(50))
+
+create table Achievement( name varchar(50), gameId int)
+
+create table GameOwned( steamId Bigint, gameId int, playTimeTwoWeek int, playTimeForever int)
+
+create table  AchievementOwned(  playerId BigInt, gameId int, name varchar(50))
+
 
 
 CODING STANDARDS
