@@ -160,12 +160,37 @@ namespace PortableSteam
 
          static void getAllData(SqlConnection conn) { 
 //define target player cridentials 
-            //long[] steamID = new long[] { 76561198065588383, 76561198047886273 };
+             //long[] steamID = new long[] { 76561198065588383, 76561198047886273, 76561198018133285 };
             SteamWebAPI.SetGlobalKey("00E30769A6BA27CB7804374A82DBD737");
 
             //create steam identity
-            var colin = SteamIdentity.FromSteamID(76561198018133285);
+            var colin = SteamIdentity.FromSteamID(76561198047886273
+                );
             var brenden = SteamIdentity.FromSteamID(76561198065588383);
+
+//POPULATE GAME TABLE
+            //define sql command
+            string gameStatement = "INSERT INTO Game(gameId, name) VALUES(@GameID, @Name)";
+
+            SqlCommand gameCommand = new SqlCommand(gameStatement, conn);
+            gameCommand.Parameters.Add("@GameID", SqlDbType.Int);
+            gameCommand.Parameters.Add("@Name", SqlDbType.VarChar, 50);
+
+            //get the game info on the currently defined player
+            var gameInfo = SteamWebAPI.General().ISteamApps().GetAppList().GetResponse();
+
+            //cycle through the returned data and execute each command
+            foreach (var game in gameInfo.Data.Apps)
+            {
+                Console.WriteLine(game.Name);
+                Console.WriteLine(game.AppID);
+                gameCommand.Parameters["@GameID"].Value = game.AppID;
+                gameCommand.Parameters["@Name"].Value = game.Name;
+
+                gameCommand.ExecuteNonQuery();
+                if (game.AppID > 300)
+                    break;
+            }
 
 //POPULATE PLAYER TABLE
             //define sql command
@@ -204,72 +229,62 @@ namespace PortableSteam
             achievementCommand.Parameters.Add("@GameId", SqlDbType.Int);
 
             //get the game info on the currently defined player
-            var achievementInfo = SteamWebAPI.General().ISteamUserStats().GetPlayerAchievements(440, colin).GetResponse();
+            var gameOwnedInfo = SteamWebAPI.General().IPlayerService().GetOwnedGames(colin).GetResponse();
 
             //cycle through the returned data and execute each command
-            foreach (var achievement in achievementInfo.Data.Achievements)
+            foreach (var gameOwned in gameOwnedInfo.Data.Games)
             {
-                Console.WriteLine(achievement.APIName);
-                Console.WriteLine(440);
-                achievementCommand.Parameters["@Name"].Value = achievement.APIName;
-                achievementCommand.Parameters["@GameId"].Value = 440;
+                //get the achievement info on the currently defined player
+                var achievementInfo = SteamWebAPI.General().ISteamUserStats().GetPlayerAchievements( gameOwned.AppID, colin).GetResponse();
+                
+                if (achievementInfo.Response.Success)
+                {
+                    //cycle through the returned data and execute each command
+                    foreach (var achievement in achievementInfo.Data.Achievements)
+                    {
+                        Console.WriteLine(achievement.APIName);
+                        Console.WriteLine(gameOwned.AppID);
+                        achievementCommand.Parameters["@Name"].Value = achievement.APIName;
+                        achievementCommand.Parameters["@GameId"].Value = gameOwned.AppID;
 
-                achievementCommand.ExecuteNonQuery();
-            }
+                        achievementCommand.ExecuteNonQuery();
+                    }
+                }
+                
 
-//POPULATE GAME TABLE
-            //define sql command
-            string gameStatement = "INSERT INTO Game(gameId, name) VALUES(@GameID, @Name)";
-
-            SqlCommand gameCommand = new SqlCommand(gameStatement, conn);
-            gameCommand.Parameters.Add("@GameID", SqlDbType.Int);
-            gameCommand.Parameters.Add("@Name", SqlDbType.VarChar, 50);
-
-            //get the game info on the currently defined player
-            var gameInfo = SteamWebAPI.General().ISteamApps().GetAppList().GetResponse();
-
-            //cycle through the returned data and execute each command
-            foreach (var game in gameInfo.Data.Apps)
-            {
-                Console.WriteLine(game.Name);
-                Console.WriteLine(game.AppID);
-                gameCommand.Parameters["@GameID"].Value = game.AppID;
-                gameCommand.Parameters["@Name"].Value = game.Name;
-
-                gameCommand.ExecuteNonQuery();
-                if (game.AppID > 300)
+                if (gameOwned.AppID > 300)
                     break;
             }
-            
-            
-            //POPULATE GameOwned TABLE
+
+//POPULATE GameOwned TABLE
             //define sql command
-            string gameOwnedStatement = "INSERT INTO GameOwned(steamId, gameId,playTimeTwoWeek,playTimeForever) VALUES(@SteamId, @GameID, @PlayTimeTwoWeek, @PlayTimeForever)";
+            /*
+            string gameOwnedStatement = "INSERT INTO GameOwned(steamId, gameId, playTimeTwoWeek, playTimeForever) VALUES(@SteamId, @GameId, @PlayTimeTwoWeek, @PlayTimeForever)";
 
             SqlCommand gameOwnedCommand = new SqlCommand(gameOwnedStatement, conn);
             gameOwnedCommand.Parameters.Add("@SteamId", SqlDbType.BigInt);
-            gameOwnedCommand.Parameters.Add("@GameID", SqlDbType.Int);
+            gameOwnedCommand.Parameters.Add("@GameId", SqlDbType.Int);
             gameOwnedCommand.Parameters.Add("@PlayTimeTwoWeek", SqlDbType.Int);
-            gameOwnedCommand.Parameters.Add("@PlayTimeForever", SqlDbType.VarChar, 50);
-            //get the game info on the currently defined player
-            var gameOwnedInfo = SteamWebAPI.General().IPlayerService().GetOwnedGames(colin).GetResponse();
+            gameOwnedCommand.Parameters.Add("@PlayTimeForever", SqlDbType.Int);
 
             //cycle through the returned data and execute each command
             foreach (var gameOwned in gameOwnedInfo.Data.Games)
             {
                 Console.WriteLine(gameOwned.Name);
                 Console.WriteLine(gameOwned.AppID);
-                gameOwnedCommand.Parameters["@SteamId"].Value = colin;
-                gameOwnedCommand.Parameters["@GameID"].Value = gameOwned.AppID;
-                gameOwnedCommand.Parameters["@PlayTimeTwoWeek"].Value = gameOwned.PlayTime2Weeks;
-                gameOwnedCommand.Parameters["@PlayTimeForever"].Value = gameOwned.PlayTimeTotal;
+                Console.WriteLine(gameOwned.PlayTime2Weeks.TotalMinutes);
+                Console.WriteLine(gameOwned.PlayTimeTotal.TotalMinutes);
+                Console.WriteLine("asdf");
+                gameOwnedCommand.Parameters["@SteamId"].Value = colin.SteamID;
+                gameOwnedCommand.Parameters["@GameId"].Value = 440;
+                gameOwnedCommand.Parameters["@PlayTimeTwoWeek"].Value = 1;//Convert.ToInt32(gameOwned.PlayTime2Weeks.TotalMinutes);
+                gameOwnedCommand.Parameters["@PlayTimeForever"].Value = 1;//Convert.ToInt32(gameOwned.PlayTimeTotal.TotalMinutes);
 
                 gameOwnedCommand.ExecuteNonQuery();
                 if (gameOwned.AppID > 300)
                     break;
             }
-            
-            
+            */
             //close sql connection and exit
             conn.Close();
             Console.WriteLine("press enter to exit");
