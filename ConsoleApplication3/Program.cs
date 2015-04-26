@@ -169,8 +169,7 @@ namespace PortableSteam
                                                             SteamIdentity.FromSteamID(76561197996591065),
                                                             SteamIdentity.FromSteamID(76561197999979429),
                                                             SteamIdentity.FromSteamID(76561198009844144)};
-
-            populateGameTable(conn);
+            
             foreach(var player in steamID){
                 populatePlayerTable(conn, player);
                 populateGameOwnedTable(conn, player);
@@ -230,8 +229,6 @@ namespace PortableSteam
                 gameCommand.Parameters["@Name"].Value = game.Name;
 
                 gameCommand.ExecuteNonQuery();
-                if (game.AppID > 300)
-                    break;
             }
         }
         static void populateGameOwnedTable(SqlConnection conn, SteamIdentity person)
@@ -343,7 +340,7 @@ namespace PortableSteam
                 //http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key=00E30769A6BA27CB7804374A82DBD737&appid=240
                 //http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key=00E30769A6BA27CB7804374A82DBD737&appid=730
                 bool bad = false;
-                int[] badIds = new int[] { 240, 730, 223220, 221910, 35450, 236830, 317950 };
+                int[] badIds = new int[] { 240, 730, 223220, 221910, 35450, 236830, 317950, 104320, 224780 };
                 foreach(var badId in badIds){if(badId == gameOwned.AppID){bad = true;}}
                 if(bad == true){continue;}
 
@@ -356,14 +353,20 @@ namespace PortableSteam
                     //the try for see if there Achievements
                     try
                     {
-                        //cycle through the returned data and execute each command
-                        foreach (var achievement in achievementInfo.Data.AvailableGameStats.Achievements)
-                        {
-                            achievementCommand.Parameters["@Name"].Value = achievement.Name;
-                            achievementCommand.Parameters["@GameId"].Value = gameOwned.AppID;
+                        //if there already in the table
+                        try
+                        {   //cycle through the returned data and execute each command
+                            foreach (var achievement in achievementInfo.Data.AvailableGameStats.Achievements)
+                            {
+                                achievementCommand.Parameters["@Name"].Value = achievement.Name;
+                                achievementCommand.Parameters["@GameId"].Value = gameOwned.AppID;
 
-                            achievementCommand.ExecuteNonQuery();
+                                achievementCommand.ExecuteNonQuery();
+                            }
                         }
+                        catch { 
+                        
+                       }
                     }
                     catch
                     {
