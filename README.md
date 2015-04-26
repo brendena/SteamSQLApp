@@ -28,7 +28,10 @@ Things to remember
 In the current code your namespace is PortableSteam.
 So SteamWebAPI and SteamIdentity or ReleastionshipType are all inherited from PortableSteam.
 There's a differance from acount.id and steam.id
-
+Example Value
+-------------
+Player - 76561198047886273
+game - 440
 SQL Schema
 ----------
 
