@@ -17,9 +17,9 @@ namespace PortableSteam
     {
         static void Main(string[] args)
         {
+            bool playingWithSQL = true;
             //OPEN CONNECTION AND DEFINE TARGET PLAYER
             //open the sql connection by finding the server on the currently used computer
-            bool stillTestingSQL = true;
             SqlConnection conn = new SqlConnection("Server=BRENDEN_PC\\SQLEXPRESS;" +
                                                     "Database=steamDb;" +
                                                     "Integrated Security=true");
@@ -28,7 +28,7 @@ namespace PortableSteam
 
             SqlDataReader reader;
             reader = null;
-            while (stillTestingSQL)
+            while (playingWithSQL == true)
             {
                 string value = getInputFor("go through the options\n" +
                                              "1 profile\n" +
@@ -36,7 +36,7 @@ namespace PortableSteam
                                              "3 achivment\n" +
                                              "4 refresh data\n" +
                                              "5 do fancy SQL Queries\n" +
-                                             "6 done");
+                                             "6 done ");
 
                 switch (Convert.ToInt32(value))
                 {
@@ -63,26 +63,24 @@ namespace PortableSteam
                                 Console.WriteLine("none of your things matched");
                                 break;
                         }
-
                         if (reader != null)
                         {
                             if (reader.Read())
                                 do
                                 {
-                                    Console.WriteLine("steam Id {0}", reader.GetInt64(0));
-                                    Console.WriteLine("person name {0}", reader.GetString(1));
+                                    Console.WriteLine("steam ID {0}", reader.GetInt64(0));
+                                    Console.WriteLine("name {0}", reader.GetString(1));
                                     Console.WriteLine("URL {0}", reader.GetString(2));
-                                    Console.WriteLine("Last Log Off {0} \n", reader.GetDateTime(3));
+                                    Console.WriteLine("Date created {0} \n", reader.GetDateTime(3));
                                 } while (reader.Read());
                             else
                             { //if you can't read anything from reader that means you didn't get any rows of data
                                 Console.WriteLine("cound't find anything");
                             }
                         }
-
                         reader.Close();
                         break;
-                    case 2: //Game
+                    case 2: //Game info
                         value = getInputFor("go through the options\n" +
                                             "1 get Info by id\n" +
                                             "2 get Info by name\n" +
@@ -113,15 +111,16 @@ namespace PortableSteam
                                 do
                                 {
                                     Console.WriteLine("Game Id {0}", reader.GetInt32(0));
-                                    Console.WriteLine("Name {0} \n", reader.GetString(1));
+                                    Console.WriteLine("Game Name {0}", reader.GetString(1));
                                 } while (reader.Read());
                             else
                             { //if you can't read anything from reader that mean you didn't get any rows of data
                                 Console.WriteLine("cound't find anything");
                             }
                         }
+                        reader.Close();
                         break;
-                    case 3: //game info
+                    case 3: //achievements info
                         value = getInputFor("go through the options\n" +
                                             "1 get achivments for game\n");
 
@@ -139,13 +138,15 @@ namespace PortableSteam
                             if (reader.Read())
                                 do
                                 {
-                                    Console.WriteLine("Name {0}", reader.GetString(0));
+                                    Console.WriteLine("achivement name {0}", reader.GetString(0));
+                                    Console.WriteLine("gameId {0}", reader.GetInt32(1));
                                 } while (reader.Read());
                             else
                             { //if you can't read anything from reader that mean you didn't get any rows of data
                                 Console.WriteLine("cound't find anything");
                             }
                         }
+                        reader.Close();
                         break;
                     case 4: //rebuild everthing
                         truncAllTables(conn);
@@ -164,15 +165,15 @@ namespace PortableSteam
                         {
                             case 1:
                                 value = getInputFor("user");
-                                reader = executeSQLStatmentWithReturn(conn, "SELECT personName, playTimeTwoWeek, gameId FROM GameOwned, Player WHERE playTimeTwoWeek > 0 and GameOwned.steamId = Player.steamId and Player.steamId = " + 76561198018133285 + ";");
+                                reader = executeSQLStatmentWithReturn(conn, "SELECT personName, playTimeTwoWeek, gameId FROM GameOwned, Player WHERE playTimeTwoWeek > 0 and GameOwned.steamId = Player.steamId and Player.steamId = " + value + ";");
                                 if (reader != null)
                                 {
                                     if (reader.Read())
                                         do
                                         {
-                                            Console.WriteLine("{0}", reader.GetString(0));
-                                            Console.WriteLine("{0}", reader.GetInt32(1));
-                                            Console.WriteLine("{0}\n", reader.GetInt32(2));
+                                            Console.WriteLine("person Name {0}", reader.GetString(0));
+                                            Console.WriteLine("Play time Two weeks {0}", reader.GetInt32(1));
+                                            Console.WriteLine("Game Id {0}\n", reader.GetInt32(2));
                                         } while (reader.Read());
                                     else
                                     { //if you can't read anything from reader that means you didn't get any rows of data
@@ -188,8 +189,8 @@ namespace PortableSteam
                                     if (reader.Read())
                                         do
                                         {
-                                            Console.WriteLine("{0}", reader.GetInt64(0));
-                                            Console.WriteLine("{0}\n", reader.GetString(1));
+                                            Console.WriteLine("Player Id {0}", reader.GetInt64(0));
+                                            Console.WriteLine("Player Name {0}\n", reader.GetString(1));
                                         } while (reader.Read());
                                     else
                                     { //if you can't read anything from reader that means you didn't get any rows of data
@@ -206,8 +207,8 @@ namespace PortableSteam
                                     if (reader.Read())
                                         do
                                         {
-                                            Console.WriteLine("{0}", reader.GetInt32(0));
-                                            Console.WriteLine("{0}\n", reader.GetString(1));
+                                            Console.WriteLine("Game Id {0}", reader.GetInt32(0));
+                                            Console.WriteLine("Name achivement {0}\n", reader.GetString(1));
                                         } while (reader.Read());
                                     else
                                     { //if you can't read anything from reader that means you didn't get any rows of data
@@ -224,8 +225,8 @@ namespace PortableSteam
                                     if (reader.Read())
                                         do
                                         {
-                                            Console.WriteLine("{0}", reader.GetString(0));
-                                            Console.WriteLine("{0}\n", reader.GetInt32(1));
+                                            Console.WriteLine("Name {0}", reader.GetString(0));
+                                            Console.WriteLine("Game Id {0}\n", reader.GetInt32(1));
                                         } while (reader.Read());
                                     else
                                     { //if you can't read anything from reader that means you didn't get any rows of data
@@ -234,21 +235,20 @@ namespace PortableSteam
                                 }
                                 break;
                             default:
-                                Console.WriteLine("you pick wrong");
-                                Console.WriteLine(value);
+                                Console.WriteLine("you did wrong, foo");
                                 break;
-                        }//end of case 5 inside switch
+                        }//end fancy query switch
                         break;
                     case 6:
-                        stillTestingSQL = false;
+                        playingWithSQL = false;
                         break;
                     default:
-                        Console.WriteLine("you pick wrong");
+                        Console.WriteLine("you done pick wrong");
                         Console.WriteLine(value);
                         break;
-                }//end of first swith           
-            }//end of the while loop
-        }
+                }//end main switch
+            }//end of while 
+        }//end main function
         static void getAllData(SqlConnection conn)
         {
             SteamWebAPI.SetGlobalKey("00E30769A6BA27CB7804374A82DBD737");
@@ -262,7 +262,8 @@ namespace PortableSteam
                                                             SteamIdentity.FromSteamID(76561197999979429),
                                                             SteamIdentity.FromSteamID(76561198009844144)};
             populateGameTable(conn);
-            foreach(var player in steamID){
+            foreach (var player in steamID)
+            {
                 populatePlayerTable(conn, player);
                 populateGameOwnedTable(conn, player);
                 populateAchievementTable(conn, player);
@@ -275,7 +276,7 @@ namespace PortableSteam
             Console.WriteLine("press enter to exit");
             Console.ReadLine();
         }//end of getAllData
-        static void populatePlayerTable(SqlConnection conn,SteamIdentity person)
+        static void populatePlayerTable(SqlConnection conn, SteamIdentity person)
         {
             //POPULATE PLAYER TABLE
             //define sql command
@@ -360,7 +361,7 @@ namespace PortableSteam
             friendCommand.Parameters.Add("@FriendSince", SqlDbType.DateTime);
 
             //get all the games owned
-            var friendInfo = SteamWebAPI.General().ISteamUser().GetFriendList(person,RelationshipType.Friend).GetResponse();
+            var friendInfo = SteamWebAPI.General().ISteamUser().GetFriendList(person, RelationshipType.Friend).GetResponse();
 
             //cycle through the returned data and execute each command
             foreach (var friend in friendInfo.Data.Friends)
@@ -372,7 +373,8 @@ namespace PortableSteam
                 friendCommand.ExecuteNonQuery();
             }
         }
-        static void populateAchievementOwnedTable(SqlConnection conn, SteamIdentity person) {
+        static void populateAchievementOwnedTable(SqlConnection conn, SteamIdentity person)
+        {
             //POPULATE ACHIEVEMENT OWNED TABLE
             //define sql command
             string achievementStatement = "INSERT INTO AchievementOwned(playerId, gameId, name) VALUES(@PlayerId, @GameId, @Name)";
@@ -404,13 +406,15 @@ namespace PortableSteam
                         achievementCommand.ExecuteNonQuery();
                     }
                 }
-                catch {
+                catch
+                {
                     //Console.WriteLine("can't");
                 }
             }
         }
 
-        static void populateAchievementTable(SqlConnection conn, SteamIdentity person) {
+        static void populateAchievementTable(SqlConnection conn, SteamIdentity person)
+        {
             //POPULATE ACHIEVEMENT TABLE
             //define sql command
             string achievementStatement = "INSERT INTO Achievement(name, gameId) VALUES(@Name, @GameId)";
@@ -433,8 +437,8 @@ namespace PortableSteam
                 //http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key=00E30769A6BA27CB7804374A82DBD737&appid=730
                 bool bad = false;
                 int[] badIds = new int[] { 240, 730, 223220, 221910, 35450, 236830, 317950, 104320, 224780 };
-                foreach(var badId in badIds){if(badId == gameOwned.AppID){bad = true;}}
-                if(bad == true){continue;}
+                foreach (var badId in badIds) { if (badId == gameOwned.AppID) { bad = true; } }
+                if (bad == true) { continue; }
 
 
                 //get the achievement info on a game
@@ -456,9 +460,10 @@ namespace PortableSteam
                                 achievementCommand.ExecuteNonQuery();
                             }
                         }
-                        catch { 
-                        
-                       }
+                        catch
+                        {
+
+                        }
                     }
                     catch
                     {
@@ -468,7 +473,8 @@ namespace PortableSteam
                         //Console.WriteLine("could't get the value");
                     }
                 }
-                catch {
+                catch
+                {
                     Console.WriteLine(gameOwned.AppID);
                 }
             }
@@ -488,8 +494,7 @@ namespace PortableSteam
                                     "drop table Game;\n" +
                                     "drop table Achievement;\n" +
                                     "drop table GameOwned;\n" +
-                                    "drop table AchievementOwned;\n" +
-                                    "drop table FriendHave;\n");
+                                    "drop table AchievementOwned;\n");
         }
 
         static void createAllTables(SqlConnection conn)
@@ -498,8 +503,7 @@ namespace PortableSteam
                                      "create table Game( gameId int, name varchar(50));" +
                                      "create table Achievement( name varchar(50), gameId int);" +
                                      "create table GameOwned( steamId int, gameId int, playTimeTwoWeek int, playTimeForever int);" +
-                                     "create table AchievementOwned( gameId int, playerId int, achievementId int, completed binary(1));"+
-                                     "create table FriendHave(friendOne BigInt, friendTwo BigInt, friendSince DateTime");
+                                     "create table AchievementOwned( gameId int, playerId int, achievementId int, completed binary(1));");
         }
 
         static void executeSQLStatment(SqlConnection conn, string statment)
@@ -532,17 +536,13 @@ namespace PortableSteam
 
 
         }
-        static SqlDataReader getNameFromGameId(SqlConnection conn, int id)
-        { 
-            return executeSQLStatmentWithReturn(conn, "select name from Game where gameId = " + id + ";\n");
-        }
         static string getInputFor(string request)
         {
             Console.WriteLine(request);
             return Console.ReadLine();
         }
-    }
-}
+    }//end class
+}//end namespace
 
 /*
 https://wiki.teamfortress.com/wiki/WebAPI/GetPlayerSummaries
@@ -575,12 +575,3 @@ ISteamUserStats
 GetPlayerAchievements
     -
 */
-
-/*
-SqlConnection conn = new SqlConnection("Server=BRENDEN_PC\\SQLEXPRESS;Database=shipsDB;Integrated Security=true");
-*/
-
-/*
- * how reader works
- http://idealprogrammer.com/net-languages/code-samples/sqldatareader-source-code/
- */
