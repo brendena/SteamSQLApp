@@ -470,7 +470,8 @@ namespace PortableSteam
                                     "truncate table Game;\n" +
                                     "truncate table Achievement;\n" +
                                     "truncate table GameOwned;\n" +
-                                    "truncate table AchievementOwned;\n");
+                                    "truncate table AchievementOwned;\n"  +
+                                    "truncate table FriendHave;\n");
         }
         static void dropAllTables(SqlConnection conn)
         {
