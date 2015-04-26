@@ -146,8 +146,7 @@ namespace PortableSteam
                     }
                     break;
                 case 4: //rebuild everthing
-                    //dropAllTables(conn);
-                    //createAllTables(conn);
+                    truncAllTables(conn);
                     getAllData(conn);
                     break;
                 default:
@@ -160,24 +159,25 @@ namespace PortableSteam
 
         static void getAllData(SqlConnection conn)
         {
-            //define target player cridentials 
-            //long[] steamID = new long[] { 76561198065588383, 76561198047886273, 76561198018133285 };
             SteamWebAPI.SetGlobalKey("00E30769A6BA27CB7804374A82DBD737");
 
             //create steam identity
-            var colin = SteamIdentity.FromSteamID(76561198047886273);
-            var brenden = SteamIdentity.FromSteamID(76561198065588383);
-
-
-
-            
+            SteamIdentity[] steamID = new SteamIdentity[] { SteamIdentity.FromSteamID(76561198047886273), //colin
+                                                            SteamIdentity.FromSteamID(76561198065588383),  //brenden
+                                                            SteamIdentity.FromSteamID(76561198018133285), //john
+                                                            SteamIdentity.FromSteamID(76561197983072534),
+                                                            SteamIdentity.FromSteamID(76561197996591065),
+                                                            SteamIdentity.FromSteamID(76561197999979429),
+                                                            SteamIdentity.FromSteamID(76561198009844144)};
 
             populateGameTable(conn);
-            populatePlayerTable(conn, colin);
-            populateGameOwnedTable(conn, colin);
-            populateAchievementTable(conn, colin);
-            populateAchievementOwnedTable(conn, colin);
-
+            foreach(var player in steamID){
+                populatePlayerTable(conn, player);
+                populateGameOwnedTable(conn, player);
+                populateAchievementTable(conn, player);
+                populateAchievementOwnedTable(conn, player);
+                populateFriendsHaveTable(conn, player);
+            }
 
             //close sql connection and exit
             conn.Close();
@@ -251,7 +251,6 @@ namespace PortableSteam
             var gameOwnedInfo = SteamWebAPI.General().IPlayerService().GetOwnedGames(person).GetResponse();
 
             //cycle through the returned data and execute each command
-            Console.WriteLine(gameOwnedInfo.Data.GameCount);
             foreach (var gameOwned in gameOwnedInfo.Data.Games)
             {
                 gameOwnedCommand.Parameters["@SteamId"].Value = person.SteamID;
@@ -260,6 +259,28 @@ namespace PortableSteam
                 gameOwnedCommand.Parameters["@PlayTimeForever"].Value = gameOwned.PlayTimeTotal.TotalMinutes;
 
                 gameOwnedCommand.ExecuteNonQuery();
+            }
+        }
+        static void populateFriendsHaveTable(SqlConnection conn, SteamIdentity person)
+        {
+            string friendStatement = "INSERT INTO FriendHave(friendOne, friendTwo, friendSince) VALUES(@FriendOne, @FriendTwo, @FriendSince)";
+
+            SqlCommand friendCommand = new SqlCommand(friendStatement, conn);
+            friendCommand.Parameters.Add("@FriendOne", SqlDbType.BigInt);
+            friendCommand.Parameters.Add("@FriendTwo", SqlDbType.BigInt);
+            friendCommand.Parameters.Add("@FriendSince", SqlDbType.DateTime);
+
+            //get all the games owned
+            var friendInfo = SteamWebAPI.General().ISteamUser().GetFriendList(person,RelationshipType.Friend).GetResponse();
+
+            //cycle through the returned data and execute each command
+            foreach (var friend in friendInfo.Data.Friends)
+            {
+                friendCommand.Parameters["@FriendOne"].Value = person.SteamID;
+                friendCommand.Parameters["@FriendTwo"].Value = friend.Identity.SteamID;
+                friendCommand.Parameters["@FriendSince"].Value = friend.FriendSince;
+
+                friendCommand.ExecuteNonQuery();
             }
         }
         static void populateAchievementOwnedTable(SqlConnection conn, SteamIdentity person) {
@@ -295,7 +316,7 @@ namespace PortableSteam
                     }
                 }
                 catch {
-                    Console.WriteLine("can't");
+                    //Console.WriteLine("can't");
                 }
             }
         }
@@ -320,30 +341,50 @@ namespace PortableSteam
                 //This probablem is only on this one game and the error likes in avaible games states
                 //Location
                 //http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key=00E30769A6BA27CB7804374A82DBD737&appid=240
-                if (gameOwned.AppID == 240) { continue; }
+                //http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key=00E30769A6BA27CB7804374A82DBD737&appid=730
+                bool bad = false;
+                int[] badIds = new int[] { 240, 730, 223220, 221910, 35450, 236830, 317950 };
+                foreach(var badId in badIds){if(badId == gameOwned.AppID){bad = true;}}
+                if(bad == true){continue;}
+
 
                 //get the achievement info on a game
-                var achievementInfo = SteamWebAPI.General().ISteamUserStats().GetSchemaForGame(gameOwned.AppID).GetResponse();
+                try
+                {
+                    var achievementInfo = SteamWebAPI.General().ISteamUserStats().GetSchemaForGame(gameOwned.AppID).GetResponse();
 
-                //the try for see if there Achievements
-                try{
-                    //cycle through the returned data and execute each command
-                    foreach (var achievement in achievementInfo.Data.AvailableGameStats.Achievements)
+                    //the try for see if there Achievements
+                    try
                     {
-                        Console.WriteLine("got through");
-                        achievementCommand.Parameters["@Name"].Value = achievement.Name;
-                        achievementCommand.Parameters["@GameId"].Value = gameOwned.AppID;
+                        //cycle through the returned data and execute each command
+                        foreach (var achievement in achievementInfo.Data.AvailableGameStats.Achievements)
+                        {
+                            achievementCommand.Parameters["@Name"].Value = achievement.Name;
+                            achievementCommand.Parameters["@GameId"].Value = gameOwned.AppID;
 
-                        achievementCommand.ExecuteNonQuery();
+                            achievementCommand.ExecuteNonQuery();
+                        }
+                    }
+                    catch
+                    {
+                        //example of a game that has no schema
+                        //http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key=00E30769A6BA27CB7804374A82DBD737&appid=3910
+                        //Console.WriteLine(gameOwned.AppID);
+                        //Console.WriteLine("could't get the value");
                     }
                 }
-                catch{
-                    //example of a game that has no schema
-                    //http://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key=00E30769A6BA27CB7804374A82DBD737&appid=3910
+                catch {
                     Console.WriteLine(gameOwned.AppID);
-                    Console.WriteLine("could't get the value");
                 }
             }
+        }
+        static void truncAllTables(SqlConnection conn)
+        {
+            executeSQLStatment(conn, "truncate table Player;\n" +
+                                    "truncate table Game;\n" +
+                                    "truncate table Achievement;\n" +
+                                    "truncate table GameOwned;\n" +
+                                    "truncate table AchievementOwned;\n");
         }
         static void dropAllTables(SqlConnection conn)
         {
@@ -369,7 +410,7 @@ namespace PortableSteam
             cmd.CommandText = statment;
             cmd.CommandType = CommandType.Text;
             cmd.Connection = conn;
-            cmd.ExecuteReader();
+            cmd.ExecuteNonQuery();
         }
 
         static SqlDataReader executeSQLStatmentWithReturn(SqlConnection conn, string statment)
