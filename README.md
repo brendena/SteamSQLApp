@@ -82,17 +82,23 @@ drop table GameOwned;
 drop table AchievementOwned;
 drop table FriendHave;
 
-create table Player( steamId Bigint , personName varchar(30), profileURL varchar(75), lastLogOff DateTime, primary key(steamId))
+create table Player( steamId Bigint , personName varchar(30), profileURL varchar(75), lastLogOff DateTime, 
+			primary key(steamId));
 
-create table Game( gameId int , name varchar(50))
+create table Game( gameId int , name varchar(50), 
+			primary key(gameId));
 
-create table Achievement( name varchar(50), gameId int)
+create table Achievement( name varchar(50), gameId int, 
+			primary key(name, gameId));
 
-create table GameOwned( steamId Bigint, gameId int, playTimeTwoWeek int, playTimeForever int)
+create table GameOwned( steamId Bigint, gameId int, playTimeTwoWeek int, playTimeForever int, 
+			primary key(steamId, gameId));
 
-create table  AchievementOwned(  playerId BigInt, gameId int, name varchar(50))
+create table  AchievementOwned(  playerId BigInt, gameId int, name varchar(50), 
+			primary key(playerId,gameId,name));
 
-create table FriendHave(friendOne BigInt, friendTwo BigInt, friendSince DateTime)
+create table FriendHave(friendOne BigInt, friendTwo BigInt, friendSince DateTime,
+			primary key(friendOne,friendTwo));
 
 
 
