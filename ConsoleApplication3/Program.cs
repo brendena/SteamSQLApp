@@ -169,7 +169,7 @@ namespace PortableSteam
                                                             SteamIdentity.FromSteamID(76561197996591065),
                                                             SteamIdentity.FromSteamID(76561197999979429),
                                                             SteamIdentity.FromSteamID(76561198009844144)};
-            
+            populateGameTable(conn);
             foreach(var player in steamID){
                 populatePlayerTable(conn, player);
                 populateGameOwnedTable(conn, player);
