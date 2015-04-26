@@ -19,7 +19,8 @@ namespace PortableSteam
         {
             //OPEN CONNECTION AND DEFINE TARGET PLAYER
             //open the sql connection by finding the server on the currently used computer
-            SqlConnection conn = new SqlConnection("Server=COLINREILLY\\SQLEXPRESS;" +
+            bool stillTestingSQL = true;
+            SqlConnection conn = new SqlConnection("Server=BRENDEN_PC\\SQLEXPRESS;" +
                                                     "Database=steamDb;" +
                                                     "Integrated Security=true");
             conn.Open();
@@ -27,224 +28,227 @@ namespace PortableSteam
 
             SqlDataReader reader;
             reader = null;
-
-            string value = getInputFor("go through the options\n" +
-                                         "1 profile\n" +
-                                         "2 game\n" +
-                                         "3 achivment\n" +
-                                         "4 refresh data\n" +
-                                         "5 do fancy SQL Queries");
-
-            switch (Convert.ToInt32(value))
+            while (stillTestingSQL)
             {
-                case 1: // players
-                    value = getInputFor("go through the options\n" +
-                                        "1 get Info by id\n" +
-                                        "2 get Info by name\n" +
-                                        "3 output all name\n");
+                string value = getInputFor("go through the options\n" +
+                                             "1 profile\n" +
+                                             "2 game\n" +
+                                             "3 achivment\n" +
+                                             "4 refresh data\n" +
+                                             "5 do fancy SQL Queries\n" +
+                                             "6 done");
 
-                    switch (Convert.ToInt32(value))
-                    {
-                        case 1:
-                            value = getInputFor("Id");
-                            reader = executeSQLStatmentWithReturn(conn, "SELECT * FROM Player where steamId=" + value);
-                            break;
-                        case 2:
-                            value = getInputFor("players name");
-                            reader = executeSQLStatmentWithReturn(conn, "SELECT * FROM Player where personName='" + value + "'");
-                            break;
-                        case 3:
-                            reader = executeSQLStatmentWithReturn(conn, "SELECT * FROM Player");
-                            break;
-                        default:
-                            Console.WriteLine("none of your things matched");
-                            break;
-                    }
-                    if (reader != null)
-                    {
-                        if (reader.Read())
-                            do
-                            {
-                                Console.WriteLine("{0}", reader.GetInt64(0));
-                                Console.WriteLine("{0}", reader.GetString(1));
-                                Console.WriteLine("{0}", reader.GetString(2));
-                                Console.WriteLine("{0}", reader.GetDateTime(3));
-                            } while (reader.Read());
-                        else
-                        { //if you can't read anything from reader that means you didn't get any rows of data
-                            Console.WriteLine("cound't find anything");
+                switch (Convert.ToInt32(value))
+                {
+                    case 1: // players
+                        value = getInputFor("go through the options\n" +
+                                            "1 get Info by id\n" +
+                                            "2 get Info by name\n" +
+                                            "3 output all name\n");
+
+                        switch (Convert.ToInt32(value))
+                        {
+                            case 1:
+                                value = getInputFor("Id");
+                                reader = executeSQLStatmentWithReturn(conn, "SELECT * FROM Player where steamId=" + value);
+                                break;
+                            case 2:
+                                value = getInputFor("players name");
+                                reader = executeSQLStatmentWithReturn(conn, "SELECT * FROM Player where personName='" + value + "'");
+                                break;
+                            case 3:
+                                reader = executeSQLStatmentWithReturn(conn, "SELECT * FROM Player");
+                                break;
+                            default:
+                                Console.WriteLine("none of your things matched");
+                                break;
                         }
-                    }
-                    reader.Close();
-                    break;
-                case 2: //achievements
-                    value = getInputFor("go through the options\n" +
-                                        "1 get Info by id\n" +
-                                        "2 get Info by name\n" +
-                                        "3 get games from a range");
 
-                    switch (Convert.ToInt32(value))
-                    {
-                        case 1: //get info by id
-                            value = getInputFor("Id");
-                            reader = executeSQLStatmentWithReturn(conn, "SELECT * FROM Game where gameId=" + value);
-                            break;
-                        case 2: //get info by name
-                            value = getInputFor("Name");
-                            reader = executeSQLStatmentWithReturn(conn, "SELECT * FROM Game where name='" + value + "'");
-                            break;
-                        case 3:
-                            reader = executeSQLStatmentWithReturn(conn, "SELECT * FROM Game " +
-                                                                        "where gameId > " + getInputFor("greter Then") +
-                                                                         " and gameId < " + getInputFor("less then"));
-                            break;
-                        default:
-                            break;
-                    }
-                    if (reader != null)
-                    {
-
-                        if (reader.Read())
-                            do
-                            {
-                                Console.WriteLine("{0}", reader.GetInt32(0));
-                                Console.WriteLine("{0}", reader.GetString(1));
-                            } while (reader.Read());
-                        else
-                        { //if you can't read anything from reader that mean you didn't get any rows of data
-                            Console.WriteLine("cound't find anything");
+                        if (reader != null)
+                        {
+                            if (reader.Read())
+                                do
+                                {
+                                    Console.WriteLine("steam Id {0}", reader.GetInt64(0));
+                                    Console.WriteLine("person name {0}", reader.GetString(1));
+                                    Console.WriteLine("URL {0}", reader.GetString(2));
+                                    Console.WriteLine("Last Log Off {0} \n", reader.GetDateTime(3));
+                                } while (reader.Read());
+                            else
+                            { //if you can't read anything from reader that means you didn't get any rows of data
+                                Console.WriteLine("cound't find anything");
+                            }
                         }
-                    }
-                    reader.Close();
-                    break;
-                case 3: //game info
-                    value = getInputFor("go through the options\n" +
-                                        "1 get achivments for game\n");
 
-                    switch (Convert.ToInt32(value))
-                    {
-                        case 1: //get info by id
-                            value = getInputFor("Id");
-                            reader = executeSQLStatmentWithReturn(conn, "SELECT * FROM Achievement where gameId=" + value);
-                            break;
-                        default:
-                            break;
-                    }
-                    if (reader != null)
-                    {
-                        if (reader.Read())
-                            do
-                            {
-                                Console.WriteLine("{0}", reader.GetString(0));
-                                Console.WriteLine("{0}", reader.GetInt32(1));
-                                Console.WriteLine("{0}", reader.GetInt32(2));
-                            } while (reader.Read());
-                        else
-                        { //if you can't read anything from reader that mean you didn't get any rows of data
-                            Console.WriteLine("cound't find anything");
+                        reader.Close();
+                        break;
+                    case 2: //Game
+                        value = getInputFor("go through the options\n" +
+                                            "1 get Info by id\n" +
+                                            "2 get Info by name\n" +
+                                            "3 get games from a range");
+
+                        switch (Convert.ToInt32(value))
+                        {
+                            case 1: //get info by id
+                                value = getInputFor("Id");
+                                reader = executeSQLStatmentWithReturn(conn, "SELECT * FROM Game where gameId=" + value);
+                                break;
+                            case 2: //get info by name
+                                value = getInputFor("Name");
+                                reader = executeSQLStatmentWithReturn(conn, "SELECT * FROM Game where name='" + value + "'");
+                                break;
+                            case 3:
+                                reader = executeSQLStatmentWithReturn(conn, "SELECT * FROM Game " +
+                                                                            "where gameId > " + getInputFor("greter Then") +
+                                                                             " and gameId < " + getInputFor("less then"));
+                                break;
+                            default:
+                                break;
                         }
-                    }
-                    reader.Close();
-                    break;
-                case 4: //rebuild everthing
-                    truncAllTables(conn);
-                    getAllData(conn);
-                    break;
-                case 5://do fancy queries
-                    string user, game;
+                        if (reader != null)
+                        {
 
-                    value = getInputFor("go through the options\n" +
-                                        "1 what games does a user play?\n" +
-                                        "2 who are the friends of this user who are also in the Player table?\n" +
-                                        "3 what are they achievements accomplished for a certain game by a certain user? \n" +
-                                        "4 what are the achievements not accomplished for a certain game by a certian user?");
+                            if (reader.Read())
+                                do
+                                {
+                                    Console.WriteLine("Game Id {0}", reader.GetInt32(0));
+                                    Console.WriteLine("Name {0} \n", reader.GetString(1));
+                                } while (reader.Read());
+                            else
+                            { //if you can't read anything from reader that mean you didn't get any rows of data
+                                Console.WriteLine("cound't find anything");
+                            }
+                        }
+                        break;
+                    case 3: //game info
+                        value = getInputFor("go through the options\n" +
+                                            "1 get achivments for game\n");
 
-                    switch (Convert.ToInt32(value))
-                    {
-                        case 1:
-                            value = getInputFor("user");
-                            reader = executeSQLStatmentWithReturn(conn, "SELECT personName, playTimeTwoWeek, gameId FROM GameOwned, Player WHERE playTimeTwoWeek > 0 and GameOwned.steamId = Player.steamId and Player.steamId = " + value + ";");
-                            if (reader != null)
-                            {
-                                if (reader.Read())
-                                    do
-                                    {
-                                        Console.WriteLine("{0}", reader.GetString(0));
-                                        Console.WriteLine("{0}", reader.GetInt32(1));
-                                        Console.WriteLine("{0}", reader.GetInt32(2));
-                                    } while (reader.Read());
-                                else
-                                { //if you can't read anything from reader that means you didn't get any rows of data
-                                    Console.WriteLine("cound't find anything");
-                                }
+                        switch (Convert.ToInt32(value))
+                        {
+                            case 1: //get info by id
+                                value = getInputFor("Id");
+                                reader = executeSQLStatmentWithReturn(conn, "SELECT * FROM Achievement where gameId=" + value);
+                                break;
+                            default:
+                                break;
+                        }
+                        if (reader != null)
+                        {
+                            if (reader.Read())
+                                do
+                                {
+                                    Console.WriteLine("Name {0}", reader.GetString(0));
+                                } while (reader.Read());
+                            else
+                            { //if you can't read anything from reader that mean you didn't get any rows of data
+                                Console.WriteLine("cound't find anything");
                             }
-                            break;
-                        case 2:
-                            value = getInputFor("user");
-                            reader = executeSQLStatmentWithReturn(conn, "select FriendHave.friendOne, Player.personName from FriendHave, Player where friendOne = " + value + " and Player.steamId = FriendHave.friendTwo;");
-                            if (reader != null)
-                            {
-                                if (reader.Read())
-                                    do
-                                    {
-                                        Console.WriteLine("{0}", reader.GetInt64(0));
-                                        Console.WriteLine("{0}", reader.GetString(1));
-                                    } while (reader.Read());
-                                else
-                                { //if you can't read anything from reader that means you didn't get any rows of data
-                                    Console.WriteLine("cound't find anything");
-                                }
-                            }
-                            break;
-                        case 3:
-                            user = getInputFor("user");
-                            game = getInputFor("game");
-                            reader = executeSQLStatmentWithReturn(conn, "select gameId, name from AchievementOwned where playerId = " + user + " and gameId = " + game + ";");
-                            if (reader != null)
-                            {
-                                if (reader.Read())
-                                    do
-                                    {
-                                        Console.WriteLine("{0}", reader.GetInt32(0));
-                                        Console.WriteLine("{0}", reader.GetString(1));
-                                    } while (reader.Read());
-                                else
-                                { //if you can't read anything from reader that means you didn't get any rows of data
-                                    Console.WriteLine("cound't find anything");
-                                }
-                            }
-                            break;
-                        case 4:
-                            user = getInputFor("user");
-                            game = getInputFor("game");
-                            reader = executeSQLStatmentWithReturn(conn, "(SELECT name, gameId FROM Achievement where gameId = " + game + ") EXCEPT (SELECT name, gameId FROM AchievementOwned WHERE playerId = " + user + " and gameId = " + game + ");");
-                            if (reader != null)
-                            {
-                                if (reader.Read())
-                                    do
-                                    {
-                                        Console.WriteLine("{0}", reader.GetString(0));
-                                        Console.WriteLine("{0}", reader.GetInt32(1));
-                                    } while (reader.Read());
-                                else
-                                { //if you can't read anything from reader that means you didn't get any rows of data
-                                    Console.WriteLine("cound't find anything");
-                                }
-                            }
-                            break;
-                        default:
-                            Console.WriteLine("you did wrong, foo");
-                            break;
-                    }//end fancy query switch
-                    break;
-                default:
-                    Console.WriteLine("you done pick wrong");
-                    Console.WriteLine(value);
-                    break;
-                    }//end main switch
-            Console.ReadLine();
-        }//end main function
+                        }
+                        break;
+                    case 4: //rebuild everthing
+                        truncAllTables(conn);
+                        getAllData(conn);
+                        break;
+                    case 5://do fancy queries
+                        string user, game;
 
+                        value = getInputFor("go through the options\n" +
+                                            "1 what games does a user play?\n" +
+                                            "2 who are the friends of this user who are also in the Player table?\n" +
+                                            "3 what are they achievements accomplished for a certain game by a certain user? \n" +
+                                            "4 what are the achievements not accomplished for a certain game by a certian user?");
+
+                        switch (Convert.ToInt32(value))
+                        {
+                            case 1:
+                                value = getInputFor("user");
+                                reader = executeSQLStatmentWithReturn(conn, "SELECT personName, playTimeTwoWeek, gameId FROM GameOwned, Player WHERE playTimeTwoWeek > 0 and GameOwned.steamId = Player.steamId and Player.steamId = " + 76561198018133285 + ";");
+                                if (reader != null)
+                                {
+                                    if (reader.Read())
+                                        do
+                                        {
+                                            Console.WriteLine("{0}", reader.GetString(0));
+                                            Console.WriteLine("{0}", reader.GetInt32(1));
+                                            Console.WriteLine("{0}\n", reader.GetInt32(2));
+                                        } while (reader.Read());
+                                    else
+                                    { //if you can't read anything from reader that means you didn't get any rows of data
+                                        Console.WriteLine("cound't find anything");
+                                    }
+                                }
+                                break;
+                            case 2:
+                                value = getInputFor("user");
+                                reader = executeSQLStatmentWithReturn(conn, "select FriendHave.friendOne, Player.personName from FriendHave, Player where friendOne = " + value + " and Player.steamId = FriendHave.friendTwo;");
+                                if (reader != null)
+                                {
+                                    if (reader.Read())
+                                        do
+                                        {
+                                            Console.WriteLine("{0}", reader.GetInt64(0));
+                                            Console.WriteLine("{0}\n", reader.GetString(1));
+                                        } while (reader.Read());
+                                    else
+                                    { //if you can't read anything from reader that means you didn't get any rows of data
+                                        Console.WriteLine("cound't find anything");
+                                    }
+                                }
+                                break;
+                            case 3:
+                                user = getInputFor("user");
+                                game = getInputFor("game");
+                                reader = executeSQLStatmentWithReturn(conn, "select gameId, name from AchievementOwned where playerId = " + user + " and gameId = " + game + ";");
+                                if (reader != null)
+                                {
+                                    if (reader.Read())
+                                        do
+                                        {
+                                            Console.WriteLine("{0}", reader.GetInt32(0));
+                                            Console.WriteLine("{0}\n", reader.GetString(1));
+                                        } while (reader.Read());
+                                    else
+                                    { //if you can't read anything from reader that means you didn't get any rows of data
+                                        Console.WriteLine("cound't find anything");
+                                    }
+                                }
+                                break;
+                            case 4:
+                                user = getInputFor("user");
+                                game = getInputFor("game");
+                                reader = executeSQLStatmentWithReturn(conn, "(SELECT name, gameId FROM Achievement where gameId = " + game + ") EXCEPT (SELECT name, gameId FROM AchievementOwned WHERE playerId = " + user + " and gameId = " + game + ");");
+                                if (reader != null)
+                                {
+                                    if (reader.Read())
+                                        do
+                                        {
+                                            Console.WriteLine("{0}", reader.GetString(0));
+                                            Console.WriteLine("{0}\n", reader.GetInt32(1));
+                                        } while (reader.Read());
+                                    else
+                                    { //if you can't read anything from reader that means you didn't get any rows of data
+                                        Console.WriteLine("cound't find anything");
+                                    }
+                                }
+                                break;
+                            default:
+                                Console.WriteLine("you pick wrong");
+                                Console.WriteLine(value);
+                                break;
+                        }//end of case 5 inside switch
+                        break;
+                    case 6:
+                        stillTestingSQL = false;
+                        break;
+                    default:
+                        Console.WriteLine("you pick wrong");
+                        Console.WriteLine(value);
+                        break;
+                }//end of first swith           
+            }//end of the while loop
+        }
         static void getAllData(SqlConnection conn)
         {
             SteamWebAPI.SetGlobalKey("00E30769A6BA27CB7804374A82DBD737");
@@ -475,7 +479,7 @@ namespace PortableSteam
                                     "truncate table Game;\n" +
                                     "truncate table Achievement;\n" +
                                     "truncate table GameOwned;\n" +
-                                    "truncate table AchievementOwned;\n"  +
+                                    "truncate table AchievementOwned;\n" +
                                     "truncate table FriendHave;\n");
         }
         static void dropAllTables(SqlConnection conn)
@@ -484,7 +488,8 @@ namespace PortableSteam
                                     "drop table Game;\n" +
                                     "drop table Achievement;\n" +
                                     "drop table GameOwned;\n" +
-                                    "drop table AchievementOwned;\n");
+                                    "drop table AchievementOwned;\n" +
+                                    "drop table FriendHave;\n");
         }
 
         static void createAllTables(SqlConnection conn)
@@ -493,7 +498,8 @@ namespace PortableSteam
                                      "create table Game( gameId int, name varchar(50));" +
                                      "create table Achievement( name varchar(50), gameId int);" +
                                      "create table GameOwned( steamId int, gameId int, playTimeTwoWeek int, playTimeForever int);" +
-                                     "create table AchievementOwned( gameId int, playerId int, achievementId int, completed binary(1));");
+                                     "create table AchievementOwned( gameId int, playerId int, achievementId int, completed binary(1));"+
+                                     "create table FriendHave(friendOne BigInt, friendTwo BigInt, friendSince DateTime");
         }
 
         static void executeSQLStatment(SqlConnection conn, string statment)
@@ -526,13 +532,17 @@ namespace PortableSteam
 
 
         }
+        static SqlDataReader getNameFromGameId(SqlConnection conn, int id)
+        { 
+            return executeSQLStatmentWithReturn(conn, "select name from Game where gameId = " + id + ";\n");
+        }
         static string getInputFor(string request)
         {
             Console.WriteLine(request);
             return Console.ReadLine();
         }
-    }//end class
-}//end namespace
+    }
+}
 
 /*
 https://wiki.teamfortress.com/wiki/WebAPI/GetPlayerSummaries
