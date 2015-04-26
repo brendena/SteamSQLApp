@@ -62,17 +62,27 @@ AchievementOwned(
 	achievementId int,
 	Primary Key(gameId,playerId,achievementId))
 
+FriendHave(
+	playerOne BigInt,
+	playerTwo BigInt,
+	friendSince DateTime,
+	Primary Key(playerOne,playerTwo)
+)
+
 
 
 SQL starter Code
 ----------------
+use steamDb;
+
 drop table Player;
 drop table Game;
 drop table Achievement;
 drop table GameOwned;
 drop table AchievementOwned;
+drop table FriendHave;
 
-create table Player( steamId Bigint , personName varchar(30), profileURL varchar(75), lastLogOff DateTime)
+create table Player( steamId Bigint , personName varchar(30), profileURL varchar(75), lastLogOff DateTime, primary key(steamId))
 
 create table Game( gameId int , name varchar(50))
 
@@ -81,6 +91,8 @@ create table Achievement( name varchar(50), gameId int)
 create table GameOwned( steamId Bigint, gameId int, playTimeTwoWeek int, playTimeForever int)
 
 create table  AchievementOwned(  playerId BigInt, gameId int, name varchar(50))
+
+create table FriendHave(friendOne BigInt, friendTwo BigInt, friendSince DateTime)
 
 
 
