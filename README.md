@@ -1,4 +1,4 @@
-shittySteamSQLApp
+SteamSQLApp
 -----------------
 
 Portable Steam doc's
